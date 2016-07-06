@@ -1,5 +1,5 @@
 # Check interface traffic script for Icinga2
-# Require: Powershell script execution enabled, check_network.exe from Icinga2 windows plugin
+# Require: Powershell script execution enabled, 'check_network.exe' script from Icinga2 Windows plugin
 # v.20160610 by mmarodin
 #
 # https://github.com/mmarodin/icinga2-plugins

@@ -1,5 +1,5 @@
 # Check disk status script for Icinga2
-# Require: Powershell script execution enabled, check_disk.exe from Icinga2 windows plugin
+# Require: Powershell script execution enabled, 'check_disk.exe' script from Icinga2 Windows plugin
 # Always return OK state
 # v.20160421 by mmarodin
 #
