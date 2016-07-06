@@ -97,8 +97,6 @@ COUNTDOWN=0
 #   vlan 3
 #   authentication open
 #end
-#
-#mlv-ap1240-01#
       [ ! -e $FILE.$NAME ] && echo "Execution problem, probably hostname did not respond!" && exit 2
     VLAN=`cat -e $FILE.$NAME | grep vlan | awk 'BEGIN { FS = " " } { print $2 }'`
 #3^M$
