@@ -1,0 +1,36 @@
+#!/bin/expect -f
+#---------------
+# Expect script to grab Aironet interface/ssid/vlan, works with Icinga2 script
+# v.20160316 by mmarodin
+# Syntax is:
+# ./check_aironet_interface.exp <ip> <user> <password> <ssid>
+log_user 0
+set timeout 1
+set ipaddr [lindex $argv 0]
+set user [lindex $argv 1]
+set password [lindex $argv 2]
+set ssid [lindex $argv 3]
+set tmpfile /tmp/tmp_icinga2_ssid.$ipaddr.$ssid
+
+spawn ssh -M $user@$ipaddr
+while 1 {
+expect {
+"no?" { send "yes\r" }
+"assword:" {send "$password\r" }
+"#" {break}
+}
+}
+ expect "#" 
+send "show running-config ssid $ssid\r"  
+set tmpfile_id [open $tmpfile w]
+set done 0
+while { $done == 0 } {
+expect "#" { 
+set result $expect_out(buffer)
+puts $tmpfile_id $result
+close $tmpfile_id
+set done 1 }
+}
+expect "#" { send "\n" }
+expect "#" { send "exit\n" }
+expect eof

@@ -1,0 +1,34 @@
+#!/bin/expect -f
+# 6/13/2015, ddunlap@mcnc.org
+# Expect script to grab Aerohive cpu "show cpu"
+# Syntax is:
+# ./cpu.exp <ip> <ssh-password>
+# Modified by mmarodin v20160317 to work with Icinga2 script
+log_user 0
+set timeout 1
+set ipaddr [lindex $argv 0]
+set password [lindex $argv 1]
+set tmpfile /tmp/tmp_icinga2_cpu.$ipaddr
+
+spawn ssh -M admin@$ipaddr
+while 1 {
+expect {
+"no?" { send "yes\r" }
+"assword:" {send "$password\r" }
+"#" {break}
+}
+}
+ expect "#" 
+send "show cpu\r"  
+set tmpfile_id [open $tmpfile w]
+set done 0
+while { $done == 0 } {
+expect "#" { 
+set result $expect_out(buffer)
+puts $tmpfile_id $result
+close $tmpfile_id
+set done 1 }
+}
+expect "#" { send "\n" }
+expect "#" { send "exit\n" }
+expect eof
