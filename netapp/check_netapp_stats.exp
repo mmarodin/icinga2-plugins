@@ -1,0 +1,37 @@
+#!/bin/expect -f
+#---------------
+# Expect script to grab Netapp ops/throughput/latency in cDOT mode, works with Icinga2 script
+# v.20160617 by mmarodin
+# Syntax is:
+# ./check_netapp_stats.exp <ip> <user> <password> <vserver>
+log_user 0
+set timeout 1
+set ipaddr [lindex $argv 0]
+set user [lindex $argv 1]
+set password [lindex $argv 2]
+set vserver [lindex $argv 3]
+set tmpfile /tmp/tmp_icinga2_stats.$ipaddr.$vserver
+
+spawn ssh -M $user@$ipaddr
+while 1 {
+expect {
+"no?" { send "yes\r" }
+"assword:" {send "$password\r" }
+">" {break}
+}
+}
+ expect ">" 
+#send "statistics vserver show\r"  
+send "statistics vserver show -vserver $vserver\r"  
+set tmpfile_id [open $tmpfile w]
+set done 0
+while { $done == 0 } {
+expect ">" { 
+set result $expect_out(buffer)
+puts $tmpfile_id $result
+close $tmpfile_id
+set done 1 }
+}
+expect ">" { send "\n" }
+expect ">" { send "exit\n" }
+expect eof
