@@ -21,5 +21,5 @@ enjoy these plugins:
 
 see screenshots under folder's plugins for a quick view
 
-try these funny addons to send HTML Icinga2 notifications via email with graphs (they use Grafana via API to embed them)
-- Notification (coming soon!)
+try these funny addons to send HTML Icinga2 notifications via email with graphs:
+- Notification (use Grafana via API to embed graphs)
