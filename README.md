@@ -9,6 +9,7 @@ enjoy these plugins:
 - Aerohive APs
 - APC ATS and PDUs
 - Cisco Aironet APs
+- DD-WRT APs
 - Dell Powerconnect switches
 - Linux systems
 - Netapp storages
@@ -23,3 +24,6 @@ see screenshots under folder's plugins for a quick view
 
 try these funny addons to send HTML Icinga2 notifications via email with graphs:
 - Notification (use Grafana via API to embed graphs)
+
+then I create an new event handler to restart a service only if its state is CRITICAL
+- EventHandlers
