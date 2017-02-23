@@ -1,6 +1,6 @@
 # Check single process script for Icinga2
 # Require: Powershell script execution enabled
-# v.20160421 by mmarodin
+# v.20161102 by mmarodin
 #
 # https://github.com/mmarodin/icinga2-plugins
 #
@@ -8,9 +8,14 @@
 param([string]$PROCESSNAME = "processname", [string]$WARNING = "warning", [string]$CRITICAL = "critical")
 
 $PROCESS = Get-Process $PROCESSNAME -ErrorAction silentlycontinue
-$COUNT = @($PROCESS).Count
 
-  if (($COUNT -gt $CRITICAL) -or ($COUNT -eq 0)) {
+  if (! $PROCESS) {
+    $COUNT = 0
+  } else {
+    $COUNT = @($PROCESS).Count
+  }
+
+  if (($COUNT -gt $CRITICAL) -or (! $PROCESS)) {
     $STATUS = "CRITICAL"
     $EXIT = 2
   }

@@ -2,7 +2,7 @@
 #--------
 # Check Netapp (cDOT mode) ops/throughput/latency script for Icinga2
 # Require: net-snmp-utils, bc, expect 'check_netapp_stats.exp' script
-# v.20160617 by mmarodin
+# v.20160718 by mmarodin
 #
 # https://github.com/mmarodin/icinga2-plugins
 #
@@ -22,7 +22,7 @@
         PASS=$OPTARG
         ;;
       "h")
-        echo "Useage: check_netapp_stats.sh -H hostname -u user -p password -V vserver"
+        echo "Useage: check_netapp_stats.sh -H hostname -u user -p password -V \"vserver1;vserver2;...\""
         exit 2
         ;;
       "?")
@@ -47,18 +47,25 @@
   [ -z $VSRV ] && echo "Please specify vserver!" && exit 2
 
 EXSCRIPT="/opt/scripts/icinga2/check_netapp_stats.exp"
-FILE="/tmp/tmp_icinga2_stats.$HOST.$VSRV"
+FILE="/tmp/tmp_icinga2_stats.$HOST"
+#FILE="/tmp/tmp_icinga2_stats.$HOST.$VSRV"
 
-#$EXSCRIPT $HOST $USER $PASS >/dev/null 2>&1
-$EXSCRIPT $HOST $USER $PASS $VSRV >/dev/null 2>&1
+$EXSCRIPT $HOST $USER $PASS >/dev/null 2>&1
+#$EXSCRIPT $HOST $USER $PASS $VSRV >/dev/null 2>&1
 
   [ ! -e $FILE ] && echo "Execution problem, probably hostname did not respond!" && exit 2
 
-VALUES=(`cat $FILE | grep "$VSRV "`)
+COUNT=0
+VSVM=(`echo $VSRV | sed 's/;/ /g'`)
+  for NAME in ${VSVM[@]} ; do
+    VALUES=(`cat $FILE | grep "$NAME;" | sed 's/;/ /g'`)
+    [ ${#VALUES[@]} -lt 7 ] && echo "Netapp CLI problem!" && exit 2
+    [ "${VALUES[7]}" == "-" ] && VALUES[7]=0
+    [ $COUNT -eq 1 ] && DESCR=$DESCR"- "
+    DESCR=$DESCR"${VALUES[0]} Total Ops : ${VALUES[1]}, Read Ops : ${VALUES[2]}, Write Ops : ${VALUES[3]}, Other Ops : ${VALUES[4]}, Read : ${VALUES[5]} Bps, Write : ${VALUES[6]} Bps, Latency : ${VALUES[7]} us "
+    PERFD=$PERFD" '"$NAME"_ops_total'=${VALUES[1]};0;0;0 '"$NAME"_ops_read'=${VALUES[2]};0;0;0 '"$NAME"_ops_write'=${VALUES[3]};0;0;0 '"$NAME"_ops_other'=${VALUES[4]};0;0;0 '"$NAME"_read'=${VALUES[5]}B;0;0;0 '"$NAME"_write'=${VALUES[6]}B;0;0;0 '"$NAME"_latency'=${VALUES[7]}us;0;0;0"
+    COUNT=1
+  done
 
-  [ ${#VALUES[@]} -lt 7 ] && echo "Netapp CLI problem!" && exit 2
-  [ "${VALUES[7]}" == "-" ] && VALUES[7]=0
-
-echo "OK: ${VALUES[0]} - Total Ops : ${VALUES[1]}, Read Ops : ${VALUES[2]}, Write Ops : ${VALUES[3]}, Other Ops : ${VALUES[4]}, Read : ${VALUES[5]} Bps, Write : ${VALUES[6]} Bps, Latency : ${VALUES[7]} us | 'ops_total'=${VALUES[1]};0;0;0 'ops_read'=${VALUES[2]};0;0;0 'ops_write'=${VALUES[3]};0;0;0 'ops_other'=${VALUES[4]};0;0;0 'read'=${VALUES[5]}B;0;0;0 'write'=${VALUES[6]}B;0;0;0 'latency'=${VALUES[7]}us;0;0;0"
-
+echo "OK: $DESCR|$PERFD"
 exit 0

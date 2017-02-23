@@ -1,7 +1,7 @@
 #!/bin/python
 #------------
 # Service notification script for Icinga2
-# v.20160504 by mmarodin
+# v.20170223 by mmarodin
 #
 # https://github.com/mmarodin/icinga2-plugins
 #
@@ -98,7 +98,7 @@ if (NOTIFICATIONAUTHORNAME and NOTIFICATIONCOMMENT):
 if (SERVICEPERFDATA or PANELURL):
   HTML += '\n</table><br>'
   HTML += '\n<table width=' + WIDTH + '>'
-  HTML += '\n<tr><th colspan=6 class=perfdata>Permormance Data</th></tr>'
+  HTML += '\n<tr><th colspan=6 class=perfdata>Performance Data</th></tr>'
   if (SERVICEPERFDATA):
     HTML += '\n<tr><th>Label</th><th>Last Value</th><th>Warning</th><th>Critical</th><th>Min</th><th>Max</th></tr>'
     PERFDATALIST = SERVICEPERFDATA.split(" ")
@@ -106,9 +106,27 @@ if (SERVICEPERFDATA or PANELURL):
       (LABEL,DATA) = PERFDATA.split("=")
       if (len(DATA.split(";")) is 5):
         (VALUE,WARNING,CRITICAL,MIN,MAX) = DATA.split(";")
-      else:
+#      else:
+#        (VALUE,WARNING,CRITICAL,MIN) = DATA.split(";")
+#        MAX = ''
+      if (len(DATA.split(";")) is 4):
         (VALUE,WARNING,CRITICAL,MIN) = DATA.split(";")
         MAX = ''
+      if (len(DATA.split(";")) is 3):
+        (VALUE,WARNING,CRITICAL) = DATA.split(";")
+        MAX = ''
+        MIN = ''
+      if (len(DATA.split(";")) is 2):
+        (VALUE,WARNING) = DATA.split(";")
+        MAX = ''
+        MIN = ''
+        CRITICAL = ''
+      if (len(DATA.split(";")) is 1):
+        VALUE = DATA
+        MAX = ''
+        MIN = ''
+        CRITICAL = ''
+        WARNING = ''
       HTML += '\n<tr><td>' + LABEL + '</td><td>' + VALUE + '</td><td>' + WARNING + '</td><td>' + CRITICAL + '</td><td>' + MIN + '</td><td>' + MAX + '</td></tr>'
   else:
     HTML += '\n<tr><th width=' + COLUMN + ' colspan=1>Last Value:</th><td width=' + DIFFERENCE + ' colspan=5>none</td></tr>'

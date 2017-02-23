@@ -3,6 +3,9 @@
 # Check Netapp RAID Volume usage script for Icinga2
 # Require: net-snmp-utils, bc
 # Without specifing volname always return OK state
+#
+# Known bugs and issues: volumes > 2Tb (SNMP problem)
+#
 # v.20160502 by mmarodin
 #
 # https://github.com/mmarodin/icinga2-plugins
@@ -29,7 +32,7 @@
         NAME=$OPTARG
         ;;
       "h")
-        echo "Useage: check_netapp_volume.sh -H hostname -C community -w warn -c crit -n volname"
+        echo "Useage: check_netapp_volume.sh -H hostname -C community -V snmp_version -w warn -c crit -n volname"
         exit 2
         ;;
       "?")
