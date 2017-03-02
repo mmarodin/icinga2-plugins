@@ -133,7 +133,11 @@ msgAlternative.attach(msgText)
 msgText = MIMEText(HTML, 'html')
 msgAlternative.attach(msgText)
 
-fp = open('/usr/share/icingaweb2/public/img/logo_icinga-inv.png', 'rb')
+# Logo for Icinga2 <= 2.5.x
+#fp = open('/usr/share/icingaweb2/public/img/logo_icinga-inv.png', 'rb')
+# Logo for Icinga2 >= 2.6.x
+fp = open('/usr/share/icingaweb2/public/img/icinga-logo.png', 'rb')
+
 msgImage = MIMEImage(fp.read())
 fp.close()
 msgImage.add_header('Content-ID', '<icinga2_logo>')
