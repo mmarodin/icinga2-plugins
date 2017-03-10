@@ -1,7 +1,7 @@
 #!/bin/python
 #------------
 # Service notification script for Icinga2
-# v.20170223 by mmarodin
+# v.20170310 by mmarodin
 #
 # https://github.com/mmarodin/icinga2-plugins
 #
@@ -87,7 +87,7 @@ HTML += '\n<tr><th colspan=2 class=icinga width=' + WIDTH +'><img src="cid:icing
 HTML += '\n<tr><th width=' + COLUMN + '>Notification Type:</th><td class=' + SERVICESTATE + '>' + NOTIFICATIONTYPE + '</td></tr>'
 HTML += '\n<tr><th>Service Name:</th><td>' + SERVICEDISPLAYNAME+ '</td></tr>'
 HTML += '\n<tr><th>Service Status:</th><td>' + SERVICESTATE + '</td></tr>'
-HTML += '\n<tr><th>Service Data:</th><td><a style="color: #0095bf; text-decoration: none;" href="' + ICINGA2BASE + '/monitoring/service/show?host=' + HOSTALIAS + '&service=' + SERVICEDESC + '">' + SERVICEOUTPUT + '</a></td></tr>'
+HTML += '\n<tr><th>Service Data:</th><td><a style="color: #0095bf; text-decoration: none;" href="' + ICINGA2BASE + '/monitoring/service/show?host=' + HOSTALIAS + '&service=' + SERVICEDESC + '">' + SERVICEOUTPUT.replace("\n", "<br>") + '</a></td></tr>'
 HTML += '\n<tr><th>Hostalias:</th><td><a style="color: #0095bf; text-decoration: none;" href="' + ICINGA2BASE +'/monitoring/host/show?host=' + HOSTALIAS + '">' + HOSTALIAS + '</a></td></tr>'
 HTML += '\n<tr><th>IP Address:</th><td>' + HOSTADDRESS + '</td></tr>'
 HTML += '\n<tr><th>Event Time:</th><td>' + LONGDATETIME + '</td></tr>'
