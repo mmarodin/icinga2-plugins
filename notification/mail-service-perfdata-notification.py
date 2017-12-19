@@ -103,6 +103,9 @@ if (SERVICEPERFDATA or PANELURL):
     HTML += '\n<tr><th>Label</th><th>Last Value</th><th>Warning</th><th>Critical</th><th>Min</th><th>Max</th></tr>'
     PERFDATALIST = SERVICEPERFDATA.split(" ")
     for PERFDATA in PERFDATALIST:
+      if '=' not in PERFDATA:
+        continue
+
       (LABEL,DATA) = PERFDATA.split("=")
       if (len(DATA.split(";")) is 5):
         (VALUE,WARNING,CRITICAL,MIN,MAX) = DATA.split(";")
