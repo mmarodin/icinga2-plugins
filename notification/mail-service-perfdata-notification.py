@@ -182,9 +182,7 @@ msgAlternative.attach(msgText)
 
 # Attach images
 if os.path.exists(logoImagePath):
-  with open(logoImagePath, 'rb') as fp:
-    pass
-
+  fp = open(logoImagePath, 'rb')
   msgImage = MIMEImage(fp.read())
   fp.close()
   msgImage.add_header('Content-ID', '<icinga2_logo>')
