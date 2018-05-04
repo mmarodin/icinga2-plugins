@@ -21,8 +21,9 @@ PASSWORD = ''
 ICINGA2BASE = 'http://icinga2.fqdn.here/icingaweb2'
 GRAFANABASE = 'http://grafana.fqdn.here:3000'
 GRAFANADASHBOARD = 'yourdashboard'
-GRAFANAVARHOST = 'var-HOST'
-GRAFANAVARSERVICE = 'var-SERVICE'
+GRAFANADASHBOARDUID = 'yourdashboarduid'
+GRAFANAVARHOST = 'var-hostname'
+GRAFANAVARSERVICE = 'var-service'
 GRAFANATHEME = 'light'
 GRAFANAAPIKEY = 'yourAPIkey'
 WIDTH = '640'
@@ -65,8 +66,8 @@ if not SERVICEURL:
 SUBJECTMESSAGE = NOTIFICATIONTYPE + ' - ' + HOSTDISPLAYNAME + ' - ' + SERVICEDISPLAYNAME + ' is ' + SERVICESTATE
 
 if PANELURL:
-  GRAFANAPNG = GRAFANABASE + '/render/dashboard-solo/db/' + GRAFANADASHBOARD + '?fullscreen&panelId=' + PANELURL + '&' + GRAFANAVARHOST + '=' + HOSTURL + '&' + GRAFANAVARSERVICE + '=' + SERVICEURL + '&theme=' + GRAFANATHEME + '&width=' + WIDTH + '&height=' + HEIGHT
-  GRAFANALINK = GRAFANABASE + '/dashboard/db/' + GRAFANADASHBOARD + '?fullscreen&panelId=' + PANELURL + '&' + GRAFANAVARHOST + '=' + HOSTURL + '&' + GRAFANAVARSERVICE + '=' + SERVICEURL
+  GRAFANAPNG = GRAFANABASE + '/render/d-solo/' + GRAFANADASHBOARDUID + '/' + GRAFANADASHBOARD + '?&panelId=' + PANELURL + '&' + GRAFANAVARHOST + '=' + HOSTURL + '&' + GRAFANAVARSERVICE + '=' + SERVICEURL + '&theme=' + GRAFANATHEME + '&width=' + WIDTH + '&height=' + HEIGHT
+  GRAFANALINK = GRAFANABASE + '/d/' + GRAFANADASHBOARDUID + '/' + GRAFANADASHBOARD + '?&panelId=' + PANELURL + '&' + GRAFANAVARHOST + '=' + HOSTURL + '&' + GRAFANAVARSERVICE + '=' + SERVICEURL
 
 TEXT = '***** Icinga  *****'
 TEXT += '\n'

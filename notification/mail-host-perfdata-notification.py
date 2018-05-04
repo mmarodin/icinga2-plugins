@@ -21,7 +21,8 @@ PASSWORD = ''
 ICINGA2BASE = 'http://icinga2.fqdn.here/icingaweb2'
 GRAFANABASE = 'http://grafana.fqdn.here:3000'
 GRAFANADASHBOARD = 'yourdashboard'
-GRAFANAVARHOST = 'var-HOST'
+GRAFANADASHBOARDUID = 'yourdashboarduid'
+GRAFANAVARHOST = 'var-hostname'
 GRAFANATHEME = 'light'
 GRAFANAAPIKEY = 'yourAPIkey'
 WIDTH = '640'
@@ -60,8 +61,8 @@ if not HOSTADDRESS:
 SUBJECTMESSAGE = NOTIFICATIONTYPE + ' - ' + HOSTDISPLAYNAME + ' is ' + HOSTSTATE
 
 if PANELURL:
-  GRAFANAPNG = GRAFANABASE + '/render/dashboard-solo/db/' + GRAFANADASHBOARD + '?fullscreen&panelId=' + PANELURL + '&' + GRAFANAVARHOST + '=' + HOSTURL + '&theme=' + GRAFANATHEME + '&width=' + WIDTH + '&height=' + HEIGHT
-  GRAFANALINK = GRAFANABASE + '/dashboard/db/' + GRAFANADASHBOARD + '?fullscreen&panelId=' + PANELURL + '&' + GRAFANAVARHOST + '=' + HOSTURL
+  GRAFANAPNG = GRAFANABASE + '/render/d-solo/' + GRAFANADASHBOARDUID + '/' + GRAFANADASHBOARD + '?&panelId=' + PANELURL + '&' + GRAFANAVARHOST + '=' + HOSTURL + '&theme=' + GRAFANATHEME + '&width=' + WIDTH + '&height=' + HEIGHT
+  GRAFANALINK = GRAFANABASE + '/d/' + GRAFANADASHBOARDUID + '/' + GRAFANADASHBOARD + '?&panelId=' + PANELURL + '&' + GRAFANAVARHOST + '=' + HOSTURL
 
 # Prepare mail body
 TEXT = '***** Icinga  *****'
