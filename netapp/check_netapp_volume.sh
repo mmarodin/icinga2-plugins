@@ -5,8 +5,9 @@
 # Without specifing volname always return OK state
 #
 # Known bugs and issues: volumes > 2Tb (SNMP problem)
-#
-# v.20160502 by mmarodin
+# You can consider to use my fork of check_netapp_ontap plugin
+# (https://github.com/mmarodin/check_netapp_ontap)
+# v.20190118 by mmarodin
 #
 # https://github.com/mmarodin/icinga2-plugins
 #
