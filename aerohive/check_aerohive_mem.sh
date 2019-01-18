@@ -2,7 +2,7 @@
 #--------
 # Check Aerohive memory script for Icinga2
 # Require: bc, expect 'check_aerohive_mem.exp' script
-# v.20160412 by mmarodin
+# v.20181108 by mmarodin
 #
 # https://github.com/mmarodin/icinga2-plugins
 #
@@ -73,4 +73,6 @@ echo -n "RAM:$USAGE% - "
     EXIT=0
   fi
 echo " | 'ram_used'="$MEM_USED"KB;"$MEM_WARN";"$MEM_CRIT";0;"$MEM_TOTAL
+
+rm -f $FILE
 exit $EXIT

@@ -2,7 +2,7 @@
 #--------
 # Check Aerohive load script for Icinga2
 # Require: bc, expect 'check_aerohive_cpu.exp' script
-# v.20160317 by mmarodin
+# v.20181108 by mmarodin
 #
 # https://github.com/mmarodin/icinga2-plugins
 #
@@ -68,4 +68,6 @@ echo -n "CPU used:$CPU_TOTAL_FLOAT% "
     EXIT=0
   fi
 echo " | 'cpu_prct_used'=$CPU_TOTAL_FLOAT%;$WARN;$CRIT;0"
+
+rm -f $FILE
 exit $EXIT
