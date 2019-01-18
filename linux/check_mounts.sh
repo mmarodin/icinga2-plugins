@@ -4,7 +4,7 @@
 # script for Icinga2
 # Written for cifs, davfs and nfs mounts
 # Require: bc, comm
-# v.20160420 by mmarodin
+# v.20180709 by mmarodin
 #
 # https://github.com/mmarodin/icinga2-plugins
 #
@@ -29,15 +29,17 @@ IFS=$IFS_NL
       esac
   done
   for FSTAB in `cat /etc/fstab` ; do
-    TYPE=`echo $FSTAB | awk '{ print $3 }'`
-      case $TYPE in
-	cifs|davfs|nfs)
-	    [ "$FSTAB_PART" ] && FSTAB_PART=$FSTAB_PART"\n"
-	  FSTAB_PART=$FSTAB_PART"`echo $FSTAB | awk '{ print $2 }'`"
-	  ;;
-	*)
-	  ;;
-      esac
+    if [ ${FSTAB:0:1} != \# ] ; then
+      TYPE=`echo $FSTAB | awk '{ print $3 }'`
+	case $TYPE in
+	  cifs|davfs|nfs)
+	      [ "$FSTAB_PART" ] && FSTAB_PART=$FSTAB_PART"\n"
+	    FSTAB_PART=$FSTAB_PART"`echo $FSTAB | awk '{ print $2 }'`"
+	    ;;
+	  *)
+	    ;;
+        esac
+    fi
   done
 IFS=$IFS_ORIG
 
