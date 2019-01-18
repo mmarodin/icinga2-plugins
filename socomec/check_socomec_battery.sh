@@ -2,12 +2,12 @@
 #--------
 # Check Socomec battery status script for Icinga2
 # Require: net-snmp-utils, bc
-# v.20160524 by mmarodin
+# v.20180611 by mmarodin
 #
 # https://github.com/mmarodin/icinga2-plugins
 #
 
-  while getopts ":V:H:C:w:c:h" optname ; do
+  while getopts ":V:H:C:w:c:N:h" optname ; do
     case "$optname" in
       "V")
         VERS=$OPTARG
@@ -24,8 +24,11 @@
       "w")
         WARN=$OPTARG
         ;;
+      "N")
+        NEW=$OPTARG
+        ;;
       "h")
-        echo "Useage: check_socomec_battery.sh -H hostname -V version -C community -w warn -c crit"
+        echo "Useage: check_socomec_battery.sh -H hostname -V version -C community -w warn -c crit [-N]"
         exit 2
         ;;
       "?")
@@ -63,7 +66,10 @@ CAPACITY=`snmpwalk -v$VERS -c $COMM $HOST 1.3.6.1.4.1.4555.1.1.1.1.2.4.0 | grep 
   [ ! "$STATUS" ] && echo "Execution problem, probably hostname did not respond!" && exit 2
   [ ! "$CAPACITY" ] && echo "Execution problem, probably hostname did not respond!" && exit 2
 
-  if [ "$STATUS" != "2" ] ; then
+  [ "$NEW" ] && CHECK=5 || CHECK=2
+
+
+  if [ "$STATUS" != "$CHECK" ] ; then
     echo -n "CRITICAL: wrong battery status "
     EXIT=2
   else
