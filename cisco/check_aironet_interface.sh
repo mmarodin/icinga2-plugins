@@ -2,7 +2,7 @@
 #--------
 # Check Aironet interface/ssid/vlan script for Icinga2
 # Require: net-snmp-utils, bc, expect 'check_aironet_interface.exp' script, manubulon SNMP 'check_snmp_int.pl' plugin
-# v.20160609 by mmarodin
+# v.20180403 by mmarodin
 #
 # https://github.com/mmarodin/icinga2-plugins
 #
@@ -77,9 +77,17 @@ SSID=`snmpwalk -c $COMM -v $VERSC $HOST .1.3.6.1.4.1.9.9.272.1.1.1.6.1.2 | grep 
 
   [ ! "$SSID" ] && exit 2
 
-INTERFACES=`snmpwalk -c $COMM -v $VERSC $HOST .1.3.6.1.4.1.9.9.23.1.1.1.1.6 | grep -v "No Such Instance" | grep "Dot11Radio0\." | sed 's/.*\"\(.*\)\"/\1/g'`
+INTERFACES="/tmp/tmp_icinga2_int.$HOST"
+FIRMWARE=`snmpwalk -c $COMM -v $VERSC $HOST SNMPv2-MIB::sysDescr.0 | grep "12.4(21a)JA1"`
+  if [ "$FIRMWARE" ] ; then
+    #INTERFACES=`snmpwalk -c $COMM -v $VERSC $HOST .1.3.6.1.4.1.9.9.23.1.1.1.1.6 | grep -v "No Such Instance" | grep "Dot11Radio0\." | sed 's/.*\"\(.*\)\"/\1/g'`
+    snmpwalk -c $COMM -v $VERSC $HOST .1.3.6.1.4.1.9.9.23.1.1.1.1.6 | grep -v "No Such Instance" | grep "Dot11Radio0\." | sed 's/.*\"\(.*\)\"/\1/g' > $INTERFACES
 #Dot11Radio0.3
 #Dot11Radio0.9
+  else
+    #INTERFACES=`snmpwalk -c $COMM -v $VERSC $HOST IF-MIB::ifDescr | grep -v "No Such Instance" | grep "Dot11Radio0\." | sed 's/.*STRING: \(.*\)/\1/g'`
+    snmpwalk -c $COMM -v $VERSC $HOST IF-MIB::ifDescr | grep -v "No Such Instance" | grep "Dot11Radio0\." | sed 's/.*STRING: \(.*\)/\1/g' > $INTERFACES
+  fi
 
 EXSCRIPT="/opt/scripts/icinga2/check_aironet_interface.exp"
 FILE="/tmp/tmp_icinga2_ssid.$HOST"
@@ -102,12 +110,17 @@ COUNTDOWN=0
 #3^M$
     SUBINTERFACE=`echo $INT.${VLAN::-3}`
 #Dot11Radio0.3
-    MATCH=`echo $INTERFACES | grep "$SUBINTERFACE"`
+    #MATCH=`echo $INTERFACES | grep "$SUBINTERFACE"`
+    MATCH=`cat $INTERFACES | grep "$SUBINTERFACE"`
 #Dot11Radio0.3 Dot11Radio0.9
       if [ "$MATCH" ] ; then
-        VALUE_ORIG=`$MANUBULON -C $COMM -H $HOST -$VERS -t 5 -w $WARN -c $CRIT -d $DELAY -n $SUBINTERFACE -r -f -B -k -Y --label 1`
+        #VALUE_ORIG=`$MANUBULON -C $COMM -H $HOST -$VERS -t 5 -w $WARN -c $CRIT -d $DELAY -n $SUBINTERFACE -r -f -B -k -Y --label 1`
+        VALUE_ORIG=`$MANUBULON -C $COMM -H $HOST -$VERS -t 5 -w $WARN -c $CRIT -d $DELAY -n "$MATCH" -r -f -B -k -Y --label 1`
 #Dot11Radio0.3:UP (in=0.0Kbps/out=79.5Kbps):1 UP: OK | 'Dot11Radio0.3_in_bps'=0;256000000;512000000;0;54000000 'Dot11Radio0.3_out_bps'=79518;256000000;512000000;0;54000000
 #Dot11Radio0.3:DOWN: 1 int NOK : CRITICAL
+	  if [ ! "$FIRMWARE" ] ; then
+	    VALUE_ORIG=`echo "${VALUE_ORIG//$MATCH/$SUBINTERFACE}"`
+	  fi
 	  [ "$(echo $VALUE_ORIG | grep "int NOK")" ] && COUNTDOWN=`echo "$COUNTDOWN + 1" | bc` || COUNTUP=`echo "$COUNTUP + 1" | bc`
         VALUE_CHANGED=`echo ${VALUE_ORIG//$SUBINTERFACE/$NAME\_$INT}`
 #SSIDNAME1_Dot11Radio0:UP (in=0.0Kbps/out=79.5Kbps):1 UP: OK | 'SSIDNAME1_Dot11Radio0_in_bps'=0;256000000;512000000;0;54000000 'SSIDNAME1_Dot11Radio0_out_bps'=79518;256000000;512000000;0;54000000
