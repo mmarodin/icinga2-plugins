@@ -1,0 +1,33 @@
+#!/bin/expect -f
+# Expect script to grab Aerohive temperature "show system temperature"
+# v.20181106 by mmarodin
+# Syntax is:
+# ./check_aerohive_temp.exp <ip> <password>
+log_user 0
+set timeout 1
+set ipaddr [lindex $argv 0]
+set password [lindex $argv 1]
+set tmpfile /tmp/tmp_icinga2_temp.$ipaddr
+
+spawn ssh -M admin@$ipaddr
+while 1 {
+expect {
+"no?" { send "yes\r" }
+"assword:" {send "$password\r" }
+"#" {break}
+}
+}
+ expect "#" 
+send "show system temperature\r"  
+set tmpfile_id [open $tmpfile w]
+set done 0
+while { $done == 0 } {
+expect "#" { 
+set result $expect_out(buffer)
+puts $tmpfile_id $result
+close $tmpfile_id
+set done 1 }
+}
+expect "#" { send "\n" }
+expect "#" { send "exit\n" }
+expect eof
