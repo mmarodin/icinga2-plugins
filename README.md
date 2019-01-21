@@ -8,9 +8,11 @@ when it's not possible to do that, or if I could write a better plugin ... I'll 
 enjoy these plugins:
 - Aerohive APs
 - APC ATS and PDUs
+- Aruba Networks switches
 - Cisco Aironet APs
 - DD-WRT APs
 - Dell Powerconnect switches
+- HWgroup sensors
 - Linux systems
 - Netapp storages
 - Oracle VM manager and hypervisors
