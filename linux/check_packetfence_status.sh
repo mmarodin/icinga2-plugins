@@ -4,6 +4,9 @@
 # Tested with PacketFence 7.4.x release
 # v.20180404 by mmarodin
 #
+# https://github.com/mmarodin/icinga2-plugins
+#
+
 FILE=/tmp/tmp_icinga2_packetfence.status
 
 /usr/local/pf/bin/pfcmd service pf status > $FILE

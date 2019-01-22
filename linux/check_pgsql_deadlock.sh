@@ -3,6 +3,9 @@
 # Check for PostgreSQL lock
 # v.20180119 by mmarodin
 #
+# https://github.com/mmarodin/icinga2-plugins
+#
+
 HOST=127.0.0.1
 USER=icinga2
 DB=mydbname
