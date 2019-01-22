@@ -44,7 +44,7 @@
   [ -z $HOST ] && echo "Please specify hostname!" && exit 2
   [ -z $USER ] && echo "Please specify username!" && exit 2
   [ -z $PASS ] && echo "Please specify password!" && exit 2
-  [ -z $VSRV ] && echo "Please specify vserver!" && exit 2
+  [ -z $VSRV ] && echo "Please specify vserver list!" && exit 2
 
 EXSCRIPT="/opt/scripts/icinga2/check_netapp_stats.exp"
 FILE="/tmp/tmp_icinga2_stats.$HOST"

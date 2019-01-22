@@ -42,7 +42,7 @@
         WARN=$OPTARG
         ;;
       "h")
-        echo "Useage: check_aerohive_interface.sh -H hostname -u user -p password -C community -V version -i interface -d delay -w warn -c crit "
+        echo "Useage: check_aerohive_interface.sh -H hostname -u user -p password -C community -V version -i interface -d delay -w warn -c crit"
         exit 2
         ;;
       "?")
