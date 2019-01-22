@@ -1,0 +1,15 @@
+               Name                             Command               State                               Ports                              
+--------------------------------------------------------------------------------------------------------------------------------------------
+hubble_hubble_cache_1                /entrypoint.sh redis-server      Up      0.0.0.0:6379->6379/tcp                                         
+hubble_hubble_job_scheduler_1        /docker-entrypoint.sh /doc ...   Up                                                                     
+hubble_hubble_loadbalancer_1         /entrypoint.sh                   Up      0.0.0.0:443->443/tcp, 0.0.0.0:592->592/tcp, 0.0.0.0:80->80/tcp 
+hubble_hubble_logging_agent_1        sh entrypoint.sh                 Up      0.0.0.0:5044->5000/tcp                                         
+hubble_hubble_logging_dashboard_1    sh entrypoint.sh                 Up      0.0.0.0:8080->5601/tcp                                         
+hubble_hubble_logs_search_server_1   /entrypoint.sh                   Up      0.0.0.0:9200->9200/tcp, 9300/tcp                               
+hubble_hubble_monitoring_agent_1     /entrypoint.sh                   Up      0.0.0.0:5666->5666/tcp                                         
+hubble_hubble_monitoring_server_1    /bin/sh -c /entrypoint.sh        Up      0.0.0.0:81->80/tcp                                             
+hubble_hubble_queues_1               /entrypoint.sh rabbitmq-server   Up      0.0.0.0:15672->15672/tcp, 0.0.0.0:5672->5672/tcp               
+hubble_hubble_repository_1           /entrypoint.sh                   Up      0.0.0.0:5432->5432/tcp                                         
+hubble_hubble_repository_api_1       dotnet HubbleRepositoryAPI.dll   Up      0.0.0.0:5433->80/tcp                                           
+hubble_hubble_s3_service_1           dotnet HubbleS3Service.dll       Up      0.0.0.0:5000->80/tcp                                           
+hubble_hubble_storage_1              /usr/src/app/docker-entryp ...   Up      0.0.0.0:591->8000/tcp                                          
