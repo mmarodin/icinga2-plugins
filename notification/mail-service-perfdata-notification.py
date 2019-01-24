@@ -1,6 +1,7 @@
 #!/bin/python
 #------------
 # Service notification script for Icinga2
+# Customized for Icinga 2 v2.6.2, Graphite-Web v0.9.15 and Grafana v2.6.0
 # v.20170310 by mmarodin
 #
 # https://github.com/mmarodin/icinga2-plugins
