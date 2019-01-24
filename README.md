@@ -19,6 +19,7 @@ enjoy these plugins:
 - pCOWeb sensors
 - pfSense firewalls
 - QNAP storages
+- Ricoh printers
 - Socomec UPS
 - Windows systems
 
