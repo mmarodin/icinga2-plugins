@@ -115,7 +115,7 @@ if (NOTIFICATIONAUTHORNAME and NOTIFICATIONCOMMENT):
 if (HOSTPERFDATA or PANELURL):
   HTML += '\n</table><br>'
   HTML += '\n<table width=' + WIDTH + '>'
-  HTML += '\n<tr><th colspan=6 class=perfdata>Permormance Data</th></tr>'
+  HTML += '\n<tr><th colspan=6 class=perfdata>Performance Data</th></tr>'
   if (HOSTPERFDATA):
     HTML += '\n<tr><th>Label</th><th>Last Value</th><th>Warning</th><th>Critical</th><th>Min</th><th>Max</th></tr>'
     PERFDATALIST = HOSTPERFDATA.split(" ")
