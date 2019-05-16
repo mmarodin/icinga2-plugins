@@ -1,13 +1,13 @@
 #!/bin/sh
 #--------
-# Check Socomec input/output voltages script for Icinga2
+# Check Socomec Netvision/RTvision input/output voltages script for Icinga2
 # Require: net-snmp-utils, bc
-# v.20160524 by mmarodin
+# v.20190516 by mmarodin
 #
 # https://github.com/mmarodin/icinga2-plugins
 #
 
-  while getopts ":V:H:C:h" optname ; do
+  while getopts ":V:H:C:m:h" optname ; do
     case "$optname" in
       "V")
         VERS=$OPTARG
@@ -18,8 +18,11 @@
       "C")
         COMM=$OPTARG
         ;;
+      "m")
+        MODE=$OPTARG
+        ;;
       "h")
-        echo "Useage: check_socomec_voltage.sh -H hostname -V version -C community"
+        echo "Useage: check_socomec_voltage.sh -H hostname -V version -C community -m [net|rt]"
         exit 2
         ;;
       "?")
@@ -41,9 +44,18 @@
   [ -z $VERS ] && echo "Please specify SNMP version!" && exit 2
   [ -z $HOST ] && echo "Please specify hostname!" && exit 2
   [ -z $COMM ] && echo "Please specify SNMP community!" && exit 2
+  [ -z $MODE ] && MODE="net"
 
-IN=`snmpwalk -v$VERS -c $COMM $HOST 1.3.6.1.4.1.4555.1.1.1.1.3.3.1.2.1 | grep -v "No Such Object" | awk '{print $4}'`
-OUT=`snmpwalk -v$VERS -c $COMM $HOST 1.3.6.1.4.1.4555.1.1.1.1.4.4.1.2.1 | grep -v "No Such Object" | awk '{print $4}'`
+  if [ "$MODE" == "rt" ] ; then
+    VOLTIN="1.3.6.1.4.1.2254.2.4.4.3"
+    VOLTOUT="1.3.6.1.4.1.2254.2.4.5.4"
+  else
+    VOLTIN="1.3.6.1.4.1.4555.1.1.1.1.3.3.1.2.1"
+    VOLTOUT="1.3.6.1.4.1.4555.1.1.1.1.4.4.1.2.1"
+  fi
+
+IN=`snmpwalk -v$VERS -c $COMM $HOST $VOLTIN | grep -v "No Such Object" | awk '{print $4}'`
+OUT=`snmpwalk -v$VERS -c $COMM $HOST $VOLTOUT | grep -v "No Such Object" | awk '{print $4}'`
 
   [ ! "$IN" ] && echo "Execution problem, probably hostname did not respond!" && exit 2
   [ ! "$OUT" ] && echo "Execution problem, probably hostname did not respond!" && exit 2
