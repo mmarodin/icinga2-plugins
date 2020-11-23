@@ -1,10 +1,10 @@
-#!/bin/sh
-#--------
+#!/bin/bash
+#----------
 # Check if all external mounts exists and if they are correct implemented,
 # script for Icinga2
 # Written for cifs, davfs and nfs mounts
 # Require: bc, comm
-# v.20180709 by mmarodin
+# v.20200904 by mmarodin
 #
 # https://github.com/mmarodin/icinga2-plugins
 #
@@ -12,6 +12,7 @@
 TMP_MOUNT=/tmp/tmp_icinga2_disk.mount
 TMP_FSTAB=/tmp/tmp_icinga2_disk.fstab
 PLUGIN=/usr/lib64/nagios/plugins/check_disk
+#PLUGIN=/usr/lib/nagios/plugins/check_disk
 IFS_ORIG=$IFS
 IFS_NL='
 '
