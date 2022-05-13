@@ -2,7 +2,7 @@
 #--------
 # Check pCOWeb temperature and humidity status script for Icinga2
 # Require: net-snmp-utils, bc
-# v.20160608 by mmarodin
+# v.20210702 by mmarodin
 #
 # https://github.com/mmarodin/icinga2-plugins
 #
@@ -42,18 +42,18 @@
   [ -z $HOST ] && echo "Please specify hostname!" && exit 2
   [ -z $COMM ] && echo "Please specify SNMP community!" && exit 2
 
-# intake_temp		1.3.6.1.4.1.9839.2.1.2.1.0
-# intake_temp_1		1.3.6.1.4.1.9839.2.1.2.7.0
-# intake_supply		1.3.6.1.4.1.9839.2.1.2.3.0
-# blowing_temp		1.3.6.1.4.1.9839.2.1.2.5.0
-# cooling_temp		1.3.6.1.4.1.9839.2.1.2.20.0
+# intake_temp   1.3.6.1.4.1.9839.2.1.2.1.0
+# intake_temp_1   1.3.6.1.4.1.9839.2.1.2.7.0
+# intake_supply   1.3.6.1.4.1.9839.2.1.2.3.0
+# blowing_temp    1.3.6.1.4.1.9839.2.1.2.5.0
+# cooling_temp    1.3.6.1.4.1.9839.2.1.2.20.0
 #
-# dehum_set		1.3.6.1.4.1.9839.2.1.3.20.0
-# hum_set		1.3.6.1.4.1.9839.2.1.3.21.0
-# high_temp		1.3.6.1.4.1.9839.2.1.3.22.0
-# min_temp		1.3.6.1.4.1.9839.2.1.3.23.0
-# high_hum		1.3.6.1.4.1.9839.2.1.3.24.0
-# low_hum		1.3.6.1.4.1.9839.2.1.3.25.0
+# dehum_set   1.3.6.1.4.1.9839.2.1.3.20.0
+# hum_set   1.3.6.1.4.1.9839.2.1.3.21.0
+# high_temp   1.3.6.1.4.1.9839.2.1.3.22.0
+# min_temp    1.3.6.1.4.1.9839.2.1.3.23.0
+# high_hum    1.3.6.1.4.1.9839.2.1.3.24.0
+# low_hum   1.3.6.1.4.1.9839.2.1.3.25.0
 
 BASEOID="1.3.6.1.4.1.9839.2.1"
 
@@ -86,7 +86,12 @@ INTAKE_TEMP_1=`echo "scale=1; $INTAKE_TEMP_1 / 10" | bc`
 INTAKE_SUPPLY=`echo "scale=1; $INTAKE_SUPPLY / 10" | bc`
 COOLING_TEMP=`echo "scale=1; $COOLING_TEMP / 10" | bc`
 
-CHECK=`echo "(($INTAKE_TEMP + $INTAKE_TEMP_1) / 2) > ($COOLING_TEMP + 2)" | bc`
+  if [ "$COOLING_TEMP" == "-88.8" ] ; then
+    CHECK=`echo "(($INTAKE_TEMP + $INTAKE_TEMP_1) / 2) > ($INTAKE_SUPPLY + 2)" | bc`
+  else
+    CHECK=`echo "(($INTAKE_TEMP + $INTAKE_TEMP_1) / 2) > ($COOLING_TEMP + 2)" | bc`
+    COOLING=1
+  fi
 
   if [ "$CHECK" == "1" ] ; then
     echo -n "CRITICAL"
@@ -96,5 +101,9 @@ CHECK=`echo "(($INTAKE_TEMP + $INTAKE_TEMP_1) / 2) > ($COOLING_TEMP + 2)" | bc`
     EXIT=0
   fi
 
-echo " : Room temp "$INTAKE_TEMP"C - Room temp 1 "$INTAKE_TEMP_1"C - Supply air temp "$INTAKE_SUPPLY"C - Cooling temp "$COOLING_TEMP"C - Dehumidification set $DEHUM_SET% - Humidification set $HUM_SET% - High temp "$HIGH_TEMP"C - Min temp "$MIN_TEMP"C - High humidity $HIGH_HUM% - Low humidity $LOW_HUM% | 'intake_temp'=$INTAKE_TEMP;0;0;0 'intake_temp_1'=$INTAKE_TEMP_1;0;0;0 'intake_supply'=$INTAKE_SUPPLY;0;0;0 'cooling_temp'=$COOLING_TEMP;0;0;0 'dehum_set'=$DEHUM_SET;0;0;0 'hum_set'=$HUM_SET;0;0;0 'high_temp'=$HIGH_TEMP;0;0;0 'min_temp'=$MIN_TEMP;0;0;0 'high_hum'=$HIGH_HUM;0;0;0 'low_hum'=$LOW_HUM;0;0;0"
+echo -n " : Room temp "$INTAKE_TEMP"C - Room temp 1 "$INTAKE_TEMP_1"C - Supply air temp "$INTAKE_SUPPLY"C - "
+  [ "$COOLING" == "1"  ] && echo -n "Cooling temp "$COOLING_TEMP"C - Dehumidification set $DEHUM_SET% - Humidification set $HUM_SET% - High temp "$HIGH_TEMP"C - Min temp "$MIN_TEMP"C - High humidity $HIGH_HUM% - "
+echo -n "Low humidity $LOW_HUM% | 'intake_temp'=$INTAKE_TEMP;0;0;0 'intake_temp_1'=$INTAKE_TEMP_1;0;0;0 'intake_supply'=$INTAKE_SUPPLY;0;0;0 "
+  [ "$COOLING" == "1" ] && echo -n "'cooling_temp'=$COOLING_TEMP;0;0;0 'dehum_set'=$DEHUM_SET;0;0;0 'hum_set'=$HUM_SET;0;0;0 'high_temp'=$HIGH_TEMP;0;0;0 'min_temp'=$MIN_TEMP;0;0;0 'high_hum'=$HIGH_HUM;0;0;0 "
+echo -e "'low_hum'=$LOW_HUM;0;0;0"
 exit $EXIT
