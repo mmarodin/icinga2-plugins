@@ -13,7 +13,9 @@ enjoy these plugins:
 - DD-WRT APs
 - Dell Powerconnect switches
 - HWgroup sensors
-- Linux systems
+- Lantech switches
+- Linux systems and related processes
+- Microsoft Teams Rooms
 - Netapp storages
 - Oracle VM manager and hypervisors
 - pCOWeb sensors
@@ -21,6 +23,7 @@ enjoy these plugins:
 - QNAP storages
 - Ricoh printers
 - Socomec UPS
+- VISA power generators
 - Windows systems
 
 see screenshots under folder's plugins for a quick view
