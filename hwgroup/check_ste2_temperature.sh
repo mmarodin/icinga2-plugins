@@ -2,7 +2,7 @@
 #--------
 # Check HWGroup STE2 temperature and humidity status script for Icinga2
 # Require: net-snmp-utils, bc
-# v.20180504 by mmarodin
+# v.20210813 by mmarodin
 #
 # https://github.com/mmarodin/icinga2-plugins
 #
@@ -75,60 +75,62 @@ SENSORS_NAME=(`snmpwalk -v$VERS -c $COMM $HOST $BASEOID.2 |  grep -v "No Such Ob
   [ ! "$SENSORS_VALUE" ] && echo "Execution problem, probably hostname did not respond!" && exit 2
 
   for INDEX in "${!SENSORS_VALUE[@]}" ; do
-    TEXT="$TEXT - ${SENSORS_NAME[$INDEX]} ${SENSORS_VALUE[$INDEX]}"
-    SENSOR_ROUND=`echo "scale=0; ${SENSORS_VALUE[$INDEX]}" / 1 | bc`
-      
-      if [[ ${CRIT[$INDEX]} = *":"* ]] ; then
-	CRIT_MIN=`echo  ${CRIT[$INDEX]} | awk 'BEGIN { FS = ":" } { print $1 }'`
-	CRIT_MAX=`echo  ${CRIT[$INDEX]} | awk 'BEGIN { FS = ":" } { print $2 }'`
-      else
-	CRIT_MAX=${CRIT[$INDEX]}
-      fi
+    if [[ "${SENSORS_NAME[$INDEX]}" = "Temp"* ]] || [[ "${SENSORS_NAME[$INDEX]}" = "Hum"* ]] ; then
+      TEXT="$TEXT - ${SENSORS_NAME[$INDEX]} ${SENSORS_VALUE[$INDEX]}"
+      SENSOR_ROUND=`echo "scale=0; ${SENSORS_VALUE[$INDEX]}" / 1 | bc`
+        
+        if [[ ${CRIT[$INDEX]} = *":"* ]] ; then
+	        CRIT_MIN=`echo  ${CRIT[$INDEX]} | awk 'BEGIN { FS = ":" } { print $1 }'`
+	        CRIT_MAX=`echo  ${CRIT[$INDEX]} | awk 'BEGIN { FS = ":" } { print $2 }'`
+        else
+	        CRIT_MAX=${CRIT[$INDEX]}
+        fi
 
-      if [[ ${WARN[$INDEX]} = *":"* ]] ; then
-	WARN_MIN=`echo  ${WARN[$INDEX]} | awk 'BEGIN { FS = ":" } { print $1 }'`
-	WARN_MAX=`echo  ${WARN[$INDEX]} | awk 'BEGIN { FS = ":" } { print $2 }'`
-      else
-	WARN_MAX=${WARN[$INDEX]}
-      fi
+        if [[ ${WARN[$INDEX]} = *":"* ]] ; then
+	        WARN_MIN=`echo  ${WARN[$INDEX]} | awk 'BEGIN { FS = ":" } { print $1 }'`
+	        WARN_MAX=`echo  ${WARN[$INDEX]} | awk 'BEGIN { FS = ":" } { print $2 }'`
+        else
+	        WARN_MAX=${WARN[$INDEX]}
+        fi
 
-    #echo "- $INDEX - ${SENSORS_VALUE[$INDEX]} - $CRIT_MIN - $CRIT_MAX - $WARN_MIN - $WARN_MAX -"
-    #read a
+      #echo "- $INDEX - ${SENSORS_VALUE[$INDEX]} - $CRIT_MIN - $CRIT_MAX - $WARN_MIN - $WARN_MAX -"
+      #read a
 
-    LAST="$LAST ${SENSORS_NAME[$INDEX]// /_}=${SENSORS_VALUE[$INDEX]};$WARN_MAX;$CRIT_MAX"
-      [ $CRIT_MIN ] && LAST="$LAST;$CRIT_MIN;$CRIT_MAX"
+      LAST="$LAST ${SENSORS_NAME[$INDEX]// /_}=${SENSORS_VALUE[$INDEX]};$WARN_MAX;$CRIT_MAX"
+        [ $CRIT_MIN ] && LAST="$LAST;$CRIT_MIN;$CRIT_MAX"
 
-      if [ "$CRIT_MIN" != "" ] ; then
-	  if [ $SENSOR_ROUND -ge $CRIT_MAX ] || [ $SENSOR_ROUND -le $CRIT_MIN ] ; then
-	    TEXT_CRIT="$TEXT_CRIT - ${SENSORS_NAME[$INDEX]} ${SENSORS_VALUE[$INDEX]}"
-	    STATUS_CRITICAL=1
-	    unset CRIT_MIN
-	    continue
-	  fi
-      else
-	  if [ $SENSOR_ROUND -ge $CRIT_MAX ] ; then
-	    TEXT_CRIT="$TEXT_CRIT - ${SENSORS_NAME[$INDEX]} ${SENSORS_VALUE[$INDEX]}"
-	    STATUS_CRITICAL=1
-	    continue
-	  fi
-      fi
+        if [ "$CRIT_MIN" != "" ] ; then
+	    if [ $SENSOR_ROUND -ge $CRIT_MAX ] || [ $SENSOR_ROUND -le $CRIT_MIN ] ; then
+	      TEXT_CRIT="$TEXT_CRIT - ${SENSORS_NAME[$INDEX]} ${SENSORS_VALUE[$INDEX]}"
+	      STATUS_CRITICAL=1
+	      unset CRIT_MIN
+	      continue
+	    fi
+        else
+	    if [ $SENSOR_ROUND -ge $CRIT_MAX ] ; then
+	      TEXT_CRIT="$TEXT_CRIT - ${SENSORS_NAME[$INDEX]} ${SENSORS_VALUE[$INDEX]}"
+	      STATUS_CRITICAL=1
+	      continue
+	    fi
+        fi
 
-    unset CRIT_MIN
+      unset CRIT_MIN
 
-      if [ "$WARN_MIN" != "" ] ; then
-	  if [ $SENSOR_ROUND -ge $WARN_MAX ] || [ $SENSOR_ROUND -le $WARN_MIN ] ; then
-	    TEXT_CRIT="$TEXT_CRIT - ${SENSORS_NAME[$INDEX]} ${SENSORS_VALUE[$INDEX]}"
-	    STATUS_WARNING=1
-	    unset WARN_MIN
-	  fi
-      else
-          if [ $SENSOR_ROUND -ge $WARN_MAX ] ; then
-	    TEXT_CRIT="$TEXT_CRIT - ${SENSORS_NAME[$INDEX]} ${SENSORS_VALUE[$INDEX]}"
-	    STATUS_WARNING=1
-	  fi
-      fi
-
-    unset WARN_MIN
+        if [ "$WARN_MIN" != "" ] ; then
+	    if [ $SENSOR_ROUND -ge $WARN_MAX ] || [ $SENSOR_ROUND -le $WARN_MIN ] ; then
+	      TEXT_CRIT="$TEXT_CRIT - ${SENSORS_NAME[$INDEX]} ${SENSORS_VALUE[$INDEX]}"
+	      STATUS_WARNING=1
+	      unset WARN_MIN
+	    fi
+        else
+            if [ $SENSOR_ROUND -ge $WARN_MAX ] ; then
+	      TEXT_CRIT="$TEXT_CRIT - ${SENSORS_NAME[$INDEX]} ${SENSORS_VALUE[$INDEX]}"
+	      STATUS_WARNING=1
+	    fi
+        fi
+  
+      unset WARN_MIN
+    fi
   done
 
 IFS=$IFS_CURRENT
