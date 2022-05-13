@@ -2,7 +2,7 @@
 #--------
 # Check Aerohive interface/ssid script for Icinga2
 # Require: net-snmp-utils, bc, manubulon SNMP plugin 'check_snmp_int.pl'
-# v.20160414 by mmarodin
+# v.20201029 by mmarodin
 #
 # https://github.com/mmarodin/icinga2-plugins
 #
@@ -11,11 +11,11 @@
     case "$optname" in
       "V")
         VERSC=$OPTARG
-	  if [ "$VERSC" = "2c" ] ; then
-	    VERS="2"
-	  else
-	    VERS=$VERSC
-	  fi
+    if [ "$VERSC" = "2c" ] ; then
+      VERS="2"
+    else
+      VERS=$VERSC
+    fi
         ;;
       "H")
         HOST=$OPTARG
@@ -36,7 +36,7 @@
         WARN=$OPTARG
         ;;
       "h")
-        echo "Useage: check_aerohive_interface.sh -H hostname -p password -i interface -w warn -c crit -d delay"
+        echo "Useage: check_aerohive_interface.sh -H hostname -C community -i interface -w warn -c crit -d delay"
         exit 2
         ;;
       "?")
@@ -89,41 +89,44 @@ IFS=$IFS_NEWLINE
 #ssidname
     IFS=$IFS_CURRENT
       if [ $MATCH ] ; then
-	VALUE_ORIG=`$MANUBULON -C $COMM -H $HOST -$VERS -t 5 -w $WARN -c $CRIT -d $DELAY -n $MATCH -r -f -B -k -Y --label 1`
+  VALUE_ORIG=`$MANUBULON -C $COMM -H $HOST -$VERS -t 5 -w $WARN -c $CRIT -d $DELAY -n $MATCH -r -f -B -k -Y --label 1`
 #wifi0.1:UP (in=0.1Kbps/out=96.4Kbps):1 UP: OK | 'wifi0.1_in_bps'=106;256000000;512000000;0;10000000 'wifi0.1_out_bps'=96374;256000000;512000000;0;10000000
 #wifi0.3:DOWN: 1 int NOK : CRITICAL
-	  [ "$(echo $VALUE_ORIG | grep "int NOK")" ] && COUNTDOWN=`echo "$COUNTDOWN + 1" | bc` || COUNTUP=`echo "$COUNTUP + 1" | bc`
-	VALUE_CHANGED=`echo ${VALUE_ORIG//$MATCH/$NAME\_$INT}`
+    [ "$(echo $VALUE_ORIG | grep "int NOK")" ] && COUNTDOWN=`echo "$COUNTDOWN + 1" | bc` || COUNTUP=`echo "$COUNTUP + 1" | bc`
+  VALUE_CHANGED=`echo ${VALUE_ORIG//$MATCH/$NAME\_$INT}`
 #ssidname_wifi0:UP (in=0.1Kbps/out=96.4Kbps):1 UP: OK | 'ssidname_wifi0_in_bps'=106;256000000;512000000;0;10000000 'ssidname_wifi0_out_bps'=96374;256000000;512000000;0;10000000
 #ssidname_wifi0:DOWN: 1 int NOK : CRITICAL
-	FIRST=`echo $VALUE_CHANGED | awk 'BEGIN { FS = "|" } { print $1 }' | awk '{ print $1 $2}'`
+  FIRST=`echo $VALUE_CHANGED | awk 'BEGIN { FS = "|" } { print $1 }' | awk '{ print $1 $2}'`
 #ssidname_wifi0:UP(in=0.0Kbps/out=92.7Kbps):1
 #ssidname_wifi0:DOWN:1
-	STATUS=`echo $VALUE_CHANGED | awk 'BEGIN { FS = "|" } { print $1 }' | awk '{ print $4}'`
+  STATUS=`echo $VALUE_CHANGED | awk 'BEGIN { FS = "|" } { print $1 }' | awk '{ print $4}'`
 #OK
 #NOK
-	  case "$STATUS" in
-	    "OK")
-	      STATUS_OK=1
-	      ;;
-	    "WARNING")
-	      STATUS_WARNING=1
-	      ;;
-	    "CRITICAL")
-	      STATUS_CRITICAL=1
-	      ;;
-	    "NOK")
-	      STATUS_WARNING=1
-	      ;;
-	    *)
-	      CHECK=1
-	      ;;
-	  esac
-	LAST=`echo $VALUE_CHANGED | awk 'BEGIN { FS = "|" } { print $2 }'`
+    case "$STATUS" in
+      "OK")
+        STATUS_OK=1
+        ;;
+      "WARNING")
+        STATUS_WARNING=1
+        ;;
+      "CRITICAL")
+        STATUS_CRITICAL=1
+        ;;
+      "NOK")
+        STATUS_WARNING=1
+        ;;
+      "1") #BAND 5GHz DOWN EXCEPTION
+        STATUS_OK=1
+        ;;
+      *)
+        CHECK=1
+        ;;
+    esac
+  LAST=`echo $VALUE_CHANGED | awk 'BEGIN { FS = "|" } { print $2 }'`
 #'ssidname_wifi0_in_bps'=6;256000000;512000000;0;10000000 'ssidname_wifi0_out_bps'=92684;256000000;512000000;0;10000000
 #
-	OUTPUT="$OUTPUT${FIRST::-2}, "
-	PERFDATA="$PERFDATA$LAST"
+  OUTPUT="$OUTPUT${FIRST::-2}, "
+  PERFDATA="$PERFDATA$LAST"
       fi
   done
 
