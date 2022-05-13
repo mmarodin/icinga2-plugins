@@ -1,6 +1,6 @@
 # Check interface traffic script for Icinga2
 # Require: Powershell script execution enabled, check_network.exe from Icinga2 windows plugin
-# v.20180329 by mmarodin
+# v.20200227 by mmarodin
 #
 # https://github.com/mmarodin/icinga2-plugins
 #
@@ -21,8 +21,11 @@ $TMPFILE = "C:\Windows\Temp\tmp_icinga2_int.Ethernet"
 #Use with plugin v1.2
 & $PLUGINDIR'\check_network.exe' -n > $TMPFILE
 Get-Content $TMPFILE |  %{ $OUTPUT=$_.Split('|')[0]; }
-$(Get-Content $TMPFILE).Split('|')[1] | %{ $IN=$_.Split(' ')[2]; }
-$(Get-Content $TMPFILE).Split('|')[1] | %{ $OUT=$_.Split(' ')[3]; }
+#$(Get-Content $TMPFILE).Split('|')[1] | %{ $IN=$_.Split(' ')[2]; }
+#$(Get-Content $TMPFILE).Split('|')[1] | %{ $OUT=$_.Split(' ')[3]; }
+
+Get-Content $TMPFILE |  %{ $IN=$_.Split(' ')[7]; }
+Get-Content $TMPFILE |  %{ $OUT=$_.Split(' ')[8]; }
 
 Write-Host $OUTPUT" | $IN $OUT"
 $host.SetShouldExit(0)
