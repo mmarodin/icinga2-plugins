@@ -3,12 +3,12 @@
 # Check uptime of network devices via SNMP, converting timeticks to perfdata in seconds,
 # script for Icinga2
 # Require: net-snmp-utils, bc
-# v.20160420 by mmarodin
+# v.20210324 by mmarodin
 #
 # https://github.com/mmarodin/icinga2-plugins
 #
 
-  while getopts ":V:H:C:o:c:h" optname ; do
+  while getopts ":V:H:C:o:c:m:h" optname ; do
     case "$optname" in
       "V")
         VERS=$OPTARG
@@ -25,8 +25,11 @@
       "c")
         CRIT=$OPTARG
         ;;
+      "m")
+        MODEL=$OPTARG
+        ;;
       "h")
-        echo "Useage: check_uptime_snmp.sh -H hostname -C community -o oid -c crit"
+        echo "Useage: check_uptime_snmp.sh -H hostname -V version -C community -o oid -c crit [-m model]"
         exit 2
         ;;
       "?")
@@ -54,9 +57,13 @@
 OUTPUT=`snmpwalk -c $COMM -v $VERS $HOST $OID | awk 'BEGIN { FS = "= " } { print $2 }'`
   [ ! "$OUTPUT" ] && echo "Execution problem, probably hostname did not respond!" && exit 2
 TIMETICKS=`echo $OUTPUT | sed 's/.*(\(.*\)).*/\1/'`
-SECONDS=`echo "scale=0; $TIMETICKS / 100" | bc -l`
-#HOURS=`echo "scale=0; $TIMETICKS / 360000" | bc -l`
-#DAYS=`echo "scale=0; $TIMETICKS / 8640000" | bc -l`
+  if [ "$MODEL" == "lantech" ] ; then
+    SECONDS=$TIMETICKS
+  else
+    SECONDS=`echo "scale=0; $TIMETICKS / 100" | bc -l`
+    #HOURS=`echo "scale=0; $TIMETICKS / 360000" | bc -l`
+    #DAYS=`echo "scale=0; $TIMETICKS / 8640000" | bc -l`
+  fi
 
 echo -n "SNMP "
 
