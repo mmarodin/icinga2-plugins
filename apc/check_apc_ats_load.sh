@@ -7,7 +7,7 @@
 # https://github.com/mmarodin/icinga2-plugins
 #
 
- while getopts ":V:H:C:h" optname ; do
+  while getopts ":V:H:C:h" optname ; do
     case "$optname" in
       "V")
         VERSC=$OPTARG
