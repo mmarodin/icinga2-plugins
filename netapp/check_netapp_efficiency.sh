@@ -2,12 +2,12 @@
 #--------
 # Check Netapp Storage Efficiency script for Icinga2
 # Require: expect 'check_netapp_efficiency' script
-# v.20190301 by mmarodin
+# v.20220518 by mmarodin
 #
 # https://github.com/mmarodin/icinga2-plugins
 #
 
- while getopts ":H:u:p:h" optname ; do
+ while getopts ":H:u:p:r:h" optname ; do
     case "$optname" in
       "H")
         HOST=$OPTARG
@@ -18,8 +18,11 @@
       "p")
         PASS=$OPTARG
         ;;
+      "r")
+        RELEASE=$OPTARG
+        ;;
       "h")
-        echo "Useage: check_netapp_efficiency.sh -H hostname -u user -p password"
+        echo "Useage: check_netapp_efficiency.sh -H hostname -u user -p password -r release"
         exit 2
         ;;
       "?")
@@ -41,6 +44,7 @@
   [ -z $HOST ] && echo "Please specify hostname!" && exit 2
   [ -z $USER ] && echo "Please specify username!" && exit 2
   [ -z $PASS ] && echo "Please specify password!" && exit 2
+  [ -z $RELEASE ] && RELEASE=98
 
 EXSCRIPT="/opt/scripts/icinga2/check_netapp_efficiency.exp"
 FILE="/tmp/tmp_icinga2_efficiency.$HOST"
@@ -50,7 +54,14 @@ $EXSCRIPT $HOST $USER $PASS >/dev/null 2>&1
   [ ! -e $FILE ] && echo "Execution problem, probably hostname did not respond!" && exit 2
 
 AGGR_LIST=(`cat $FILE | grep "Aggregate\:" | awk '{ print $2 }' | sed 's/\r//g'`)
-SEFF_LIST=(`cat $FILE | grep "Total Data Reduction Ratio\:" | awk '{ print $5 }' | sed 's/\r//g'`)
+
+  if [ $RELEASE -le 95 ] ; then
+# Ratio output string for ONTAP <= 9.5
+    SEFF_LIST=(`cat $FILE | grep "Total Data Reduction Ratio\:" | awk '{ print $5 }' | sed 's/\r//g'`)
+  else
+# Ratio output string for ONTAP >= 9.6
+    SEFF_LIST=(`cat $FILE | grep "Total Data Reduction Efficiency Ratio\:" | awk '{ print $6 }' | sed 's/\r//g'`)
+  fi
 
   if [ $AGGR_LIST ] ; then
     echo -n "Storage efficiency "
