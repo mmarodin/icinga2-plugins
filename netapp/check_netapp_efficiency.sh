@@ -2,7 +2,7 @@
 #--------
 # Check Netapp Storage Efficiency script for Icinga2
 # Require: expect 'check_netapp_efficiency' script
-# v.20220518 by mmarodin
+# v.20220524 by mmarodin
 #
 # https://github.com/mmarodin/icinga2-plugins
 #
@@ -58,9 +58,12 @@ AGGR_LIST=(`cat $FILE | grep "Aggregate\:" | awk '{ print $2 }' | sed 's/\r//g'`
   if [ $RELEASE -le 95 ] ; then
 # Ratio output string for ONTAP <= 9.5
     SEFF_LIST=(`cat $FILE | grep "Total Data Reduction Ratio\:" | awk '{ print $5 }' | sed 's/\r//g'`)
-  else
-# Ratio output string for ONTAP >= 9.6
+  elif [ $RELEASE -le 98 ] ; then
+# Ratio output string for ONTAP >= 9.6 and <= 9.8
     SEFF_LIST=(`cat $FILE | grep "Total Data Reduction Efficiency Ratio\:" | awk '{ print $6 }' | sed 's/\r//g'`)
+  else
+# Ratio output string for ONTAP >= 9.10
+    SEFF_LIST=(`cat $FILE | grep "Total Data Reduction Efficiency Ratio w/o Snapshots\:" | awk '{ print $8 }' | sed 's/\r//g'`)
   fi
 
   if [ $AGGR_LIST ] ; then
